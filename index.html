@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Netlify - Google Forms Test</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css" />
+  </head>
+  <body>
+    <div class="container">
+      <section class="hero is-primary is-bold">
+        <div class="hero-body">
+          <h1 class="title">
+            Contact Form
+          </h1>
+          <h2 class="subtitle">
+            Google Form Test for Worldexco
+          </h2>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="columns">
+          <div class="column is-6 is-offset-3">
+            <div class="box">
+              <form id="contactForm">
+                <div class="field">
+                  <label for="name" class="label">Name</label>
+                  <div class="control">
+                    <input type="text" name="entry.23504981" id="name" class="input" placeholder="Your full name" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="email" class="label">Email</label>
+                  <div class="control">
+                    <input
+                      type="text"
+                      name="entry.770161595"
+                      id="email"
+                      class="input"
+                      placeholder="Your email address"
+                    />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <label for="message" class="label">Message</label>
+                  <div class="control">
+                    <input type="text" name="entry.1891915084" id="message" class="input" placeholder="Your message" />
+                  </div>
+                </div>
+
+                <div class="field">
+                  <div class="control">
+                    <button type="submit" class="button is-primary">Submit</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="content has-text-centered">
+          <p>
+            &copy; 2019
+          </p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Javascript -->
+    <script>
+      const form = document.querySelector('#contactForm')
+      const elements = {
+        name: document.querySelector('#name'),
+        email: document.querySelector('#email'),
+        message: document.querySelector('#message'),
+      }
+
+      function validate(formValues) {
+        let hasError = false
+
+        // Validate Fields
+        Object.keys(formValues).forEach(key => {
+          const fieldname = key.substring(0, key.length - 5) // remove "Value" from end of string e.g nameValue => name
+          if (!formValues[key].length > 0) {
+            // display error message
+            elements[fieldname].classList.add('is-danger')
+            hasError = true
+          } else {
+            elements[fieldname].classList.remove('is-danger')
+            hasError = false
+          }
+        })
+
+        if (hasError) {
+          throw new Error(`validation error`)
+        }
+      }
+
+      function contactSubmit(e) {
+        e.preventDefault()
+        const { name, email, message } = elements
+        const nameValue = name.value
+        const emailValue = email.value
+        const messageValue = message.value
+        const formValues = { nameValue, emailValue, messageValue }
+
+        // Validate if fields not empty
+        validate(formValues)
+
+        const payload = {
+          'entry.23504981': nameValue,
+          'entry.770161595': emailValue,
+          'entry.1891915084': messageValue,
+        }
+
+        // form_action
+        const action =
+          'https://docs.google.com/forms/u/0/d/e/1FAIpQLSdIVHVO-83VbgiXGvZlWGGpN7nZYs5GYqH-eoZGJlaAWCjcgA/formResponse'
+
+        fetch(action, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: Object.keys(payload)
+            .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(payload[key])}`)
+            .join('&'),
+        })
+          .then(data => {
+            console.log(data)
+            alert('Form Submitted!')
+          })
+          .catch(err => {
+            alert('Failed to send form, check console for error message')
+            console.log(err)
+          })
+      }
+
+      document.addEventListener('submit', contactSubmit)
+    </script>
+  </body>
+</html>
